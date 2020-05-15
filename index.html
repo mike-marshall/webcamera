@@ -55,7 +55,7 @@
                         console.log(text);
                         document.querySelector('#results').innerHTML = text;
 
-                        imageCapture.takePhoto({fillLightMode: "auto"})
+                        imageCapture.takePhoto({fillLightMode: "flash"})
                             .then(blob => {
                                 var picTag = document.querySelector('#pic')
                                 picTag.src = URL.createObjectURL(blob);
