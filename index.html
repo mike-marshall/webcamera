@@ -12,11 +12,20 @@
             .then(mediaStream => {                
                 const track = mediaStream.getVideoTracks()[0];
                 imageCapture = new ImageCapture(track);
-                imageCapture.getPhotoSettings()
-                    .then(settings => {
-                        var text = JSON.stringify(settings);
+                imageCapture.getPhotoCapabilities()
+                    .then(caps => {
+                        var text = "";
+
+                        if (caps.fillLightMode.length <= 0)
+                            text = text + "no fill modes<br/>";
+
+                        caps.fillLightMode.forEach(element => {
+                            text = text + "light mode: " + element + "<br/>"; 
+                        });
+                        text = text + `width range: ${caps.imageWidth.min}->${caps.imageWidth.max} step: ${caps.imageWidth.step} <br/>`;
+                        text = text + `height range: ${caps.imageHeight.min}->${caps.imageHeight.max} step: ${caps.imageHeight.step} <br/>`;
                         console.log(text);
-                        document.querySelector('#results').innerText = text;
+                        document.querySelector('#results').innerHTML = text;
                     });
 
             })
