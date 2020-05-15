@@ -1,0 +1,27 @@
+<html>
+    <body>
+        <button onclick="onGetUserMediaButtonClick();return false;">Click</button>
+        <div id="results" style="font-family: 'Courier New', Courier, monospace;">
+
+        </div>
+        <script type="text/javascript">
+            var imageCapture;
+
+            function onGetUserMediaButtonClick() {
+            navigator.mediaDevices.getUserMedia({video: true})
+            .then(mediaStream => {                
+                const track = mediaStream.getVideoTracks()[0];
+                imageCapture = new ImageCapture(track);
+                imageCapture.getPhotoSettings()
+                    .then(settings => {
+                        var text = JSON.stringify(settings);
+                        console.log(text);
+                        document.querySelector('#results').innerText = text;
+                    });
+
+            })
+            .catch(error => console.log(error));
+            }
+        </script>   
+    </body>
+</html>
