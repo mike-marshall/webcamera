@@ -1,16 +1,44 @@
 <html>
     <body>
+        <select id="camList">
+
+        </select>
+        <button onclick="enumerateCameras()">Cameras</button>
         <button onclick="onGetUserMediaButtonClick();return false;">Click</button>
-        <div id="results" style="font-family: 'Courier New', Courier, monospace;">
+        <div id="results" style="font-family: 'Courier New', Courier, monospace;">        
 
         </div>
+
+        <img id="pic" />
         <script type="text/javascript">
             var imageCapture;
 
+            function enumerateCameras() {
+                navigator.mediaDevices.enumerateDevices()
+                    .then(function(devices) {
+                    var cams = document.querySelector('#camList');
+                    devices.forEach(function(device) {
+                        console.log(device.kind + ": " + device.label +
+                                    " id = " + device.deviceId);                        
+                        var opt = document.createElement('option');
+                        opt.text = device.label;
+                        opt.value = device.deviceId;
+                        cams.appendChild(opt);
+                    });
+                    })
+                    .catch(function(err) {
+                    console.log(err.name + ": " + err.message);
+                    });
+            }
+
             function onGetUserMediaButtonClick() {
-            navigator.mediaDevices.getUserMedia({video: true})
+                var cams = document.querySelector('#camList');
+                var id = cams.options[cams.selectedIndex].value;
+                navigator.mediaDevices.getUserMedia({video: {deviceId: id }})
             .then(mediaStream => {                
-                const track = mediaStream.getVideoTracks()[0];
+                const tracks = mediaStream.getVideoTracks();
+                const track = tracks[0]; 
+                var streamCaps = track.getCapabilities();
                 imageCapture = new ImageCapture(track);
                 imageCapture.getPhotoCapabilities()
                     .then(caps => {
@@ -26,6 +54,12 @@
                         text = text + `height range: ${caps.imageHeight.min}->${caps.imageHeight.max} step: ${caps.imageHeight.step} <br/>`;
                         console.log(text);
                         document.querySelector('#results').innerHTML = text;
+
+                        imageCapture.takePhoto({width:640, height:480})//{fillLightMode: "off"})
+                            .then(blob => {
+                                var picTag = document.querySelector('#pic')
+                                picTag.src = URL.createObjectURL(blob);
+                            })
                     });
 
             })
